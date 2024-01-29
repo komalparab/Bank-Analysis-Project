@@ -1,0 +1,64 @@
+Use `Bank_Loan_project`;
+select * from finance_1;
+select * from finance_2;
+
+#KPI 1
+select year(issue_d) as Year_Of_Issue_Date , concat("$",Format(sum(loan_amnt),0)) as Total_Loan_Amnt
+From Finance_1
+Group by Year_Of_Issue_Date
+order by Year_Of_Issue_Date;
+
+select count(*) from finance_1;
+select count(*) from finance_2;
+
+#KPI 2
+
+select grade, sub_grade, concat("$",replace(Format(sum(revol_bal),0),',',',')) as Total_revol_bal 
+from finance_1 inner join finance_2
+on(finance_1.id = finance_2.id)
+Group by grade, sub_grade
+order by grade, sub_grade;
+
+#KPI 3
+
+select verification_status, 
+concat("$",format(round(sum(total_pymnt)/1000000,2),2),"M") as Total_Payment
+from finance_1 inner join finance_2
+on(finance_1.id = finance_2.id)
+Group by verification_status having verification_status in('verified','not Verified');
+
+#KPI 4
+
+select addr_state, last_credit_pull_d, loan_status
+from finance_1 inner join finance_2
+on(finance_1.id = finance_2.id)
+Group by addr_state, last_credit_pull_d, loan_status
+order by last_credit_pull_d;
+
+#KPI 5
+
+select home_ownership, last_pymnt_d,
+concat("$",format(round(sum(last_pymnt_amnt)/10000,2),2),"K") as Total_Payment
+from finance_1 inner join finance_2
+on(finance_1.id = finance_2.id)
+Group by home_ownership, last_pymnt_d
+order by last_pymnt_d DESC, home_ownership DESC;
+
+#Extra KPI
+
+SELECT Purpose, SUM(loan_amnt) AS Total_Loan_Amount
+from finance_1 inner join finance_2
+on(finance_1.id = finance_2.id)
+GROUP BY Purpose
+order by Purpose ASC;
+
+#total_loans_issued
+select count(issue_d) as total_loans_issued from finance_1;
+
+#cumulative_interest_rate
+
+select avg(int_rate) as cumulative_interest_rate from finance_1;
+
+#total_funded_amount
+
+select sum(funded_amnt) as total_funded_amount from finance_1;
